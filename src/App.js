@@ -5,6 +5,8 @@ import { PDFDocument } from 'pdf-lib';
 // Passport size dimensions in mm
 const passportWidthMM = 35; 
 const passportHeightMM = 45; 
+const stampWidthMM = 20; 
+const stampHeightMM = 25; 
 const columns = 5;
 const rows = 6;
 
@@ -96,6 +98,80 @@ const App = () => {
     }
   };
 
+  const generateMultiSizePhotoPDF = async () => {
+    if (!image) {
+      setError('Please select an image before generating the PDF.');
+      // Clear the error message after 5 seconds
+      setTimeout(clearError, 5000);
+      return;
+    }
+
+    try {
+      // Create a new PDF 
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([210, 297]);        // A4 size in mm
+
+      // Convert data URL to Uint8Array
+      const imgData = image.split(',')[1];
+      const imgBytes = Uint8Array.from(atob(imgData), c => c.charCodeAt(0));
+
+      // Check image format (e.g., png, jpeg)
+      const imgFormat = image.split(';')[0].split('/')[1]; 
+
+      // Embed the image into the PDF
+      let img;
+      if (imgFormat === 'png') {
+        img = await pdfDoc.embedPng(imgBytes);
+      } else if (imgFormat === 'jpeg' || imgFormat === 'jpg') {
+        img = await pdfDoc.embedJpg(imgBytes);
+      } else {
+        throw new Error('Unsupported image format');
+      }
+
+      const imgWidth = passportWidthMM  
+      const imgHeight = passportHeightMM 
+      var margin = 4 
+      const pageMargin = 0.23
+
+      // Draw images onto the page
+      for (let row = 0; row < 6; row++) {
+        for (let col = 0; col < columns; col++) {
+          if(row < 4){
+          page.drawImage(img, {
+            x: (pageMargin+col) * (imgWidth + margin),
+            y: page.getHeight() - (row) * (imgHeight + margin),
+            width: imgWidth,
+            height: imgHeight,
+          });
+        }
+        else{
+          page.drawImage(img, {
+            x: (pageMargin+col) * (stampWidthMM + margin),
+            y: row/2 + page.getHeight() - (row + 1.15) * (imgHeight),
+            width: stampWidthMM,
+            height: stampHeightMM,
+          });
+          margin = 2
+        }
+        }
+      }
+
+      // Save the PDF
+      const pdfBytes = await pdfDoc.save();
+      const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'passport_photos.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setError('Error generating PDF: ' + error.message);
+      setTimeout(clearError, 5000);
+    }
+  };
+
   return (
     <div className="container text-center my-5">
       <h1 className="display-4 mb-5">GoodLuck Xerox Passport Photo Generator</h1>
@@ -103,12 +179,17 @@ const App = () => {
         <input {...getInputProps()} />
         <p>Drag & drop a photo here, or click to select one</p>
       </div>
-
       <button
         onClick={generatePDF}
-        className="btn btn-primary mt-4"
+        className="btn btn-primary mt-4 me-4"
       >
         Generate PDF
+      </button>
+      <button
+        onClick={generateMultiSizePhotoPDF}
+        className="btn btn-success mt-4"
+      >
+        Multi Photo PDF
       </button>
       {error && (
         <div className="alert alert-danger w-75 mx-auto mt-3" role="alert">
