@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/passport_photo_generation/static/css/main.e6c13ad2.css",
-    "main.js": "/passport_photo_generation/static/js/main.b6e58b41.js",
+    "main.js": "/passport_photo_generation/static/js/main.26103b86.js",
     "static/js/453.1af57bf9.chunk.js": "/passport_photo_generation/static/js/453.1af57bf9.chunk.js",
     "index.html": "/passport_photo_generation/index.html",
     "main.e6c13ad2.css.map": "/passport_photo_generation/static/css/main.e6c13ad2.css.map",
-    "main.b6e58b41.js.map": "/passport_photo_generation/static/js/main.b6e58b41.js.map",
+    "main.26103b86.js.map": "/passport_photo_generation/static/js/main.26103b86.js.map",
     "453.1af57bf9.chunk.js.map": "/passport_photo_generation/static/js/453.1af57bf9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.b6e58b41.js"
+    "static/js/main.26103b86.js"
   ]
 }
